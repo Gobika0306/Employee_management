@@ -29,20 +29,31 @@ class Activity(models.Model):
     @property
     def percent_complete(self):
         if self.actual_start and self.actual_duration:
-            # Calculate the elapsed time since actual start
+            # Calculate the actual end date based on actual start and duration
+            actual_end_date = self.actual_start + datetime.timedelta(days=self.actual_duration)
+            # Calculate the plan end date based on plan start and duration
+            plan_end_date = self.plan_start + datetime.timedelta(days=self.plan_duration)
+            today = datetime.date.today()
+
+            # If the actual end date is in the past or today, the task is complete
+            if actual_end_date <= today:
+                return 100
+
+            # If the task is not completed yet, calculate elapsed actual days
+            elapsed_actual_days = (today - self.actual_start).days
+
+            # Calculate the percentage of completion based on elapsed actual days and planned duration
+            percent_complete = (elapsed_actual_days / self.plan_duration) * 100
+
+            # Ensure the percentage is between 0 and 100
+            return max(min(percent_complete, 100), 0)
+        elif self.actual_start:
+            # If actual duration is not set but actual start is set, calculate elapsed actual days
             elapsed_actual_days = (datetime.date.today() - self.actual_start).days
-            # Calculate the elapsed time since plan start
-            elapsed_plan_days = (datetime.date.today() - self.plan_start).days
-            # Calculate the expected duration
-            expected_duration = self.plan_duration
-            # Calculate the percentage of completion
-            if elapsed_actual_days <= expected_duration:
-                percent_complete = (elapsed_actual_days / expected_duration) * 100
-            else:
-                percent_complete = 100
-            return min(percent_complete, 100)  # Ensure the percentage is not greater than 100
+            percent_complete = (elapsed_actual_days / self.plan_duration) * 100
+            return max(min(percent_complete, 100), 0)
         else:
             return 0
 
     def __str__(self):
-        return self.name
+        return self.activity_name
