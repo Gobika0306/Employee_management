@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Activities</title>
+</head>
+<body>
+    <h1>Activities</h1>
+    <a href="{% url 'activity_create' %}">Create New Activity</a>
+    <ul>
+        {% for activity in activities %}
+        <li>
+            <a href="{% url 'activity_detail' activity.id %}">{{ activity.activity_name }}</a>
+            <a href="{% url 'activity_update' activity.id %}">Update</a>
+            <a href="{% url 'activity_delete' activity.id %}">Delete</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
