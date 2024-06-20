@@ -6,15 +6,15 @@ from .models import Activity
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Activity, Emp
 from .forms import ActivityForm
+from .decorators import role_required
 
-
-
-
+@role_required(['admin','employee'])
 def emp_home(request):
     emps=Emp.objects.all()
     return render(request,"emp/home.html",{'emps':emps})
 
 
+@role_required(['admin'])
 def add_emp(request):
     if request.method=="POST":
         emp_name=request.POST.get("emp_name")
@@ -37,11 +37,13 @@ def add_emp(request):
         return redirect("/emp/home/")
     return render(request,"emp/add_emp.html",{})
 
+@role_required(['admin'])
 def delete_emp(request,emp_id):
     emp=Emp.objects.get(pk=emp_id)
     emp.delete()
     return redirect("/emp/home/")
 
+@role_required(['admin'])
 def update_emp(request,emp_id):
     emp=Emp.objects.get(pk=emp_id)
     print("Yes Bhai")
@@ -49,6 +51,7 @@ def update_emp(request,emp_id):
         'emp':emp
     })
 
+@role_required(['admin'])
 def do_update_emp(request,emp_id):
     if request.method=="POST":
         emp_name=request.POST.get("emp_name")
@@ -76,7 +79,7 @@ def do_update_emp(request,emp_id):
 
 
 # Other views...
-
+@role_required(['admin','employee'])
 def activity_list_by_emp(request, emp_id):
     emp = get_object_or_404(Emp, pk=emp_id)
     activities = Activity.objects.filter(emp=emp)
@@ -84,6 +87,7 @@ def activity_list_by_emp(request, emp_id):
 
 
 # Create a new Activity
+@role_required(['admin','employee'])
 def activity_create(request, emp_id):
     emp = get_object_or_404(Emp, id=emp_id)
     if request.method == "POST":
@@ -99,6 +103,7 @@ def activity_create(request, emp_id):
 
 
 # Update an existing Activity
+@role_required(['admin','employee'])
 def activity_update(request, emp_id, activity_id):
     emp = get_object_or_404(Emp, pk=emp_id)
     activity = get_object_or_404(Activity, pk=activity_id)
@@ -112,6 +117,7 @@ def activity_update(request, emp_id, activity_id):
     return render(request, 'activity_form.html', {'form': form, 'emp': emp})
 
 # Delete an Activity
+@role_required(['admin'])
 def activity_delete(request, emp_id, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     emp = get_object_or_404(Emp, pk=emp_id)

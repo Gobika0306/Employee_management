@@ -18,9 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import *
 import emp_app.views as fun
+from emp_app import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('emp/home/', views.emp_home, name='home'),
     path("",fun.emp_home),
     path("index/",fun.emp_home),
-    path("emp/",include('emp_app.urls'))
+    path("emp/",include('emp_app.urls')),
+    path('accounts/', include('django.contrib.auth.urls')), 
 ]
